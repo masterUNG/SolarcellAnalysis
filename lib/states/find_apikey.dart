@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solacellanalysin/utility/my_constant.dart';
+import 'package:solacellanalysin/widgets/show_button.dart';
 import 'package:solacellanalysin/widgets/show_text.dart';
 
 class FindApiKey extends StatefulWidget {
@@ -28,8 +30,24 @@ class _FindApiKeyState extends State<FindApiKey> {
         children: [
           ShowText(label: 'siteId = $siteId'),
           ShowText(label: 'apiKey = $apiKey'),
+          ShowButton(
+            label: 'Save API',
+            pressFunc: () {
+              processSaveAPI();
+            },
+          )
         ],
       ),
     );
+  }
+
+  Future<void> processSaveAPI() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    var datas = <String>[];
+    datas.add(siteId!);
+    datas.add(apiKey!);
+    preferences.setStringList('data', datas).then((value) =>
+        Navigator.pushNamedAndRemoveUntil(
+            context, MyConstant.routeMainHome, (route) => false));
   }
 }
