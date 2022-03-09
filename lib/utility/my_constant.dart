@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 class MyConstant {
   static String routeMainHome = '/mainHome';
   static String routeFindAPIkey = '/findApiKey';
+  static String routeSiteDetails = '/siteDetails';
+  static String routeSettings = '/settings';
+  static String routeAbout = '/about';
 
   static String apiKey = 'VVOX8PCKBXGAHY3E2HKVJLTHDWSZH81M';
   static String siteId = '1598054';
