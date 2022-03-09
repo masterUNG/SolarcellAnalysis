@@ -49,4 +49,10 @@ class MyConstant {
         fontSize: 14,
         fontWeight: FontWeight.normal,
       );
+
+       TextStyle h3GreenStyle() => const TextStyle(
+        color: Color.fromARGB(255, 19, 116, 22),
+        fontSize: 14,
+        fontWeight: FontWeight.normal,
+      );
 }

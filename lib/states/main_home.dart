@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solacellanalysin/models/details_model.dart';
 import 'package:solacellanalysin/models/menu_model.dart';
 import 'package:solacellanalysin/models/overview_model.dart';
+import 'package:solacellanalysin/models/site_current_power_flow_model.dart';
 import 'package:solacellanalysin/utility/my_constant.dart';
 import 'package:solacellanalysin/widgets/show_card.dart';
 import 'package:solacellanalysin/widgets/show_progress.dart';
@@ -40,6 +41,7 @@ class _MainHomeState extends State<MainHome> {
   var chooseMenu;
 
   OverviewModel? overviewModel;
+  SiteCurrentPowerFlow? siteCurrentPowerFlow;
 
   @override
   void initState() {
@@ -81,12 +83,21 @@ class _MainHomeState extends State<MainHome> {
         'https://monitoringapi.solaredge.com/site/${datas![0]}/overview?api_key=${datas[1]}';
     await Dio().get(pathOverView).then((value) {
       var result = value.data['overview'];
-      overviewModel = OverviewModel.fromMap(result);
-      print('result == $value');
-      print('8Mar current Power ==>> ${overviewModel!.currentPower.power}');
+      setState(() {
+        overviewModel = OverviewModel.fromMap(result);
+      });
     });
 
     // for CurrentPowerFlow
+    String pathCurrentPowerFlow =
+        'https://monitoringapi.solaredge.com/site/${datas![0]}/currentPowerFlow?api_key=${datas[1]}';
+    await Dio().get(pathCurrentPowerFlow).then((value) {
+      var result = value.data['siteCurrentPowerFlow'];
+      print('reslut CurrentPowerFlow ==>> $result');
+      setState(() {
+        siteCurrentPowerFlow = SiteCurrentPowerFlow.fromMap(result);
+      });
+    });
   }
 
   @override
@@ -98,29 +109,86 @@ class _MainHomeState extends State<MainHome> {
               return Column(
                 children: [
                   newInforTop(constraints),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      ShowCard(
-                        size: constraints.maxWidth * 0.33,
-                        label: '12.34 kW',
-                        pathImage: 'images/current.png',
+                  newPowerLoadGrid(constraints),
+                  SizedBox(
+                    height: constraints.maxWidth * 0.25,
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                const ShowText(label: 'Today'),
+                                ShowText(
+                                  label: overviewModel == null ? '' : '${overviewModel!.lastDayData.energy}' ,
+                                  textStyle: MyConstant().h2Style(),
+                                ),
+                                ShowText(label: ''),
+                              ],
+                            ),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                ShowText(label: 'This Mouth'),
+                                ShowText(
+                                  label: '12.34 kWh',
+                                  textStyle: MyConstant().h2Style(),
+                                ),
+                                ShowText(label: ''),
+                              ],
+                            ),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                ShowText(label: 'LifeTime'),
+                                ShowText(
+                                  label: '12.34 kWh',
+                                  textStyle: MyConstant().h2Style(),
+                                ),
+                                ShowText(label: '฿ 1,234,567', textStyle: MyConstant().h3GreenStyle(),),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                      ShowCard(
-                        size: constraints.maxWidth * 0.33,
-                        label: '56.78 kW',
-                        pathImage: 'images/load.png',
-                      ),
-                      ShowCard(
-                        size: constraints.maxWidth * 0.33,
-                        label: '45.67 kW',
-                        pathImage: 'images/grid.png',
-                      ),
-                    ],
-                  ),
+                    ),
+                  )
                 ],
               );
             }),
+    );
+  }
+
+  Row newPowerLoadGrid(BoxConstraints constraints) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        ShowCard(
+          size: constraints.maxWidth * 0.33,
+          label: overviewModel == null
+              ? ''
+              : '${overviewModel!.currentPower.power} kW',
+          pathImage: 'images/current.png',
+        ),
+        ShowCard(
+          size: constraints.maxWidth * 0.33,
+          label: siteCurrentPowerFlow == null
+              ? ''
+              : '${siteCurrentPowerFlow!.load.currentPower} ${siteCurrentPowerFlow!.unit}',
+          pathImage: 'images/load.png',
+        ),
+        ShowCard(
+          size: constraints.maxWidth * 0.33,
+          label: siteCurrentPowerFlow == null
+              ? ''
+              : '${siteCurrentPowerFlow!.grid.currentPower} ${siteCurrentPowerFlow!.unit}',
+          pathImage: 'images/grid.png',
+        ),
+      ],
     );
   }
 
