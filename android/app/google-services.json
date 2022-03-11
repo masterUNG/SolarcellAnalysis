@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "807986924669",
+    "project_id": "solacellanalysis",
+    "storage_bucket": "solacellanalysis.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:807986924669:android:a9f7b2578dcd3089183514",
+        "android_client_info": {
+          "package_name": "com.flutterthailand.solacellanalysin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "807986924669-dfkgs4bpk4u0329m8do2fvuoe1pgsj9f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJIQZZg5IWfR7J7MOlB_7wcsvKs5eQdu8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "807986924669-dfkgs4bpk4u0329m8do2fvuoe1pgsj9f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

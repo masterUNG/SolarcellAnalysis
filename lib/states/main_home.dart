@@ -105,7 +105,7 @@ class _MainHomeState extends State<MainHome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: ShowSignOut(),
+     
       body: load
           ? const ShowProgress()
           : LayoutBuilder(builder: (context, constraints) {

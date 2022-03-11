@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solacellanalysin/states/about.dart';
@@ -16,7 +17,7 @@ final Map<String, WidgetBuilder> map = {
   MyConstant.routeSiteDetails: (context) => const SiteDetail(),
   MyConstant.routeSettings: (context) => const Setting(),
   MyConstant.routeAbout: (context) => const About(),
-  MyConstant.routeAddSiteId:(context) => const AddSiteId(),
+  MyConstant.routeAddSiteId: (context) => const AddSiteId(),
 };
 
 String? firstState;
@@ -24,11 +25,12 @@ String? firstState;
 Future<void> main() async {
   HttpOverrides.global = MyOverrideHttp();
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   SharedPreferences preferences = await SharedPreferences.getInstance();
   var result = preferences.getStringList('data');
-  print('result ==> $result');
+  // print('result ==> $result');
   if (result == null) {
-    firstState = MyConstant.routeFindAPIkey;
+    firstState = MyConstant.routeAddSiteId;
   } else {
     firstState = MyConstant.routeMainHome;
   }
@@ -47,7 +49,6 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       routes: map,
       initialRoute: firstState,
-     
     );
   }
 }

@@ -16,9 +16,9 @@ class MyConstant {
   // static String apiKey = 'VVOX8PCKBXGAHY3E2HKVJLTHDWSZH81M';
   // static String siteId = '1598054';
 
-  static Color primary = const Color(0xffe03a07);
+  static Color primary = Color.fromARGB(255, 204, 101, 5);
   static Color dark =  Colors.black;
-  static Color light = const Color(0xffff6f3a);
+  static Color light = const Color.fromARGB(255, 235, 176, 66);
 
   TextStyle h1Style() => TextStyle(
         color: dark,
