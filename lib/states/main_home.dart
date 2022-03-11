@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solacellanalysin/models/details_model.dart';
 import 'package:solacellanalysin/models/menu_model.dart';
@@ -8,6 +9,7 @@ import 'package:solacellanalysin/models/site_current_power_flow_model.dart';
 import 'package:solacellanalysin/utility/my_constant.dart';
 import 'package:solacellanalysin/widgets/show_card.dart';
 import 'package:solacellanalysin/widgets/show_progress.dart';
+import 'package:solacellanalysin/widgets/show_signout.dart';
 import 'package:solacellanalysin/widgets/show_text.dart';
 
 class MainHome extends StatefulWidget {
@@ -80,7 +82,7 @@ class _MainHomeState extends State<MainHome> {
 
     // for OverView
     String pathOverView =
-        'https://monitoringapi.solaredge.com/site/${datas![0]}/overview?api_key=${datas[1]}';
+        'https://monitoringapi.solaredge.com/site/${datas[0]}/overview?api_key=${datas[1]}';
     await Dio().get(pathOverView).then((value) {
       var result = value.data['overview'];
       setState(() {
@@ -90,7 +92,7 @@ class _MainHomeState extends State<MainHome> {
 
     // for CurrentPowerFlow
     String pathCurrentPowerFlow =
-        'https://monitoringapi.solaredge.com/site/${datas![0]}/currentPowerFlow?api_key=${datas[1]}';
+        'https://monitoringapi.solaredge.com/site/${datas[0]}/currentPowerFlow?api_key=${datas[1]}';
     await Dio().get(pathCurrentPowerFlow).then((value) {
       var result = value.data['siteCurrentPowerFlow'];
       print('reslut CurrentPowerFlow ==>> $result');
@@ -103,6 +105,7 @@ class _MainHomeState extends State<MainHome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: ShowSignOut(),
       body: load
           ? const ShowProgress()
           : LayoutBuilder(builder: (context, constraints) {
@@ -124,32 +127,47 @@ class _MainHomeState extends State<MainHome> {
                               children: [
                                 const ShowText(label: 'Today'),
                                 ShowText(
-                                  label: overviewModel == null ? '' : '${overviewModel!.lastDayData.energy}' ,
+                                  label: overviewModel == null
+                                      ? ''
+                                      : calculateValue(
+                                          overviewModel!.lastDayData.energy),
                                   textStyle: MyConstant().h2Style(),
                                 ),
-                                ShowText(label: ''),
+                                const ShowText(label: ''),
                               ],
                             ),
                             Column(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
-                                ShowText(label: 'This Mouth'),
+                                const ShowText(label: 'This Mouth'),
                                 ShowText(
-                                  label: '12.34 kWh',
+                                  label: overviewModel == null
+                                      ? ''
+                                      : calculateValue(
+                                          overviewModel!.lastMonthData.energy),
                                   textStyle: MyConstant().h2Style(),
                                 ),
-                                ShowText(label: ''),
+                                const ShowText(label: ''),
                               ],
                             ),
                             Column(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
-                                ShowText(label: 'LifeTime'),
+                                const ShowText(label: 'LifeTime'),
                                 ShowText(
-                                  label: '12.34 kWh',
+                                  label: overviewModel == null
+                                      ? ''
+                                      : calculateValue(
+                                          overviewModel!.lifeTimeData.energy),
                                   textStyle: MyConstant().h2Style(),
                                 ),
-                                ShowText(label: '฿ 1,234,567', textStyle: MyConstant().h3GreenStyle(),),
+                                ShowText(
+                                  label: overviewModel == null
+                                      ? ''
+                                      : calculateCurrecy(
+                                          overviewModel!.lifeTimeData.revenue),
+                                  textStyle: MyConstant().h3GreenStyle(),
+                                ),
                               ],
                             ),
                           ],
@@ -212,9 +230,12 @@ class _MainHomeState extends State<MainHome> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  ShowText(
-                    label: detailsModel!.name,
-                    textStyle: MyConstant().h2WhiteStyle(),
+                  SizedBox(
+                    width: constraints.maxWidth * 0.6,
+                    child: ShowText(
+                      label: detailsModel!.name,
+                      textStyle: MyConstant().h2WhiteStyle(),
+                    ),
                   ),
                   newDropDownMenu(),
                 ],
@@ -275,4 +296,37 @@ class _MainHomeState extends State<MainHome> {
           print('Status Logout');
         }
       });
+
+  String calculateValue(double energy) {
+    String unit;
+    String result;
+
+    print('ค่าที่ต้องการจะแปลง ==>> $energy');
+
+    double energyValue = energy;
+    if (energyValue > 1000000) {
+      unit = ' MWh';
+      energyValue = energyValue / 1000000;
+    } else if (energyValue > 1000) {
+      unit = ' kWh';
+      energyValue = energyValue / 1000;
+    } else {
+      unit = ' Wh';
+    }
+
+    NumberFormat numberFormat = NumberFormat('##0.0#', 'en_US');
+    String string = numberFormat.format(energyValue);
+
+    result = '$string $unit';
+
+    return result;
+  }
+
+  String calculateCurrecy(double revenue) {
+    String result;
+    NumberFormat numberFormat = NumberFormat('#,###.#', 'en_US');
+    String string = numberFormat.format(revenue);
+    result = '฿ $string';
+    return result;
+  }
 }

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solacellanalysin/states/about.dart';
+import 'package:solacellanalysin/states/add_site_id.dart';
 import 'package:solacellanalysin/states/find_apikey.dart';
 import 'package:solacellanalysin/states/main_home.dart';
 import 'package:solacellanalysin/states/setting.dart';
@@ -12,9 +13,10 @@ import 'package:solacellanalysin/utility/my_constant.dart';
 final Map<String, WidgetBuilder> map = {
   MyConstant.routeMainHome: (context) => const MainHome(),
   MyConstant.routeFindAPIkey: (context) => const FindApiKey(),
-  MyConstant.routeSiteDetails:(context) => const SiteDetail(),
-  MyConstant.routeSettings:(context) => const Setting(),
-  MyConstant.routeAbout:(context) => const About(),
+  MyConstant.routeSiteDetails: (context) => const SiteDetail(),
+  MyConstant.routeSettings: (context) => const Setting(),
+  MyConstant.routeAbout: (context) => const About(),
+  MyConstant.routeAddSiteId:(context) => const AddSiteId(),
 };
 
 String? firstState;
@@ -45,6 +47,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       routes: map,
       initialRoute: firstState,
+     
     );
   }
 }
