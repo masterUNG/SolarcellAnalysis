@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solacellanalysin/utility/my_constant.dart';
-import 'package:solacellanalysin/widgets/show_button.dart';
 import 'package:solacellanalysin/widgets/show_card.dart';
 
 class ShowSignOut extends StatelessWidget {
@@ -20,12 +19,5 @@ class ShowSignOut extends StatelessWidget {
       child: const ShowCard(
           size: 120, label: 'Sign Out', pathImage: 'images/signout.png'),
     );
-    // return ShowButton(
-    //     label: 'SignOut',
-    //     pressFunc: () async {
-    //       SharedPreferences preferences = await SharedPreferences.getInstance();
-    //       preferences.clear().then((value) => Navigator.pushNamedAndRemoveUntil(
-    //           context, MyConstant.routeAddSiteId, (route) => false));
-    //     });
   }
 }
