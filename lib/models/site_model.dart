@@ -4,15 +4,18 @@ import 'dart:convert';
 class SiteModel {
   final String apiKey;
   final int pinCode;
+  final String name;
   SiteModel({
     required this.apiKey,
     required this.pinCode,
+    required this.name,
   });
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'apiKey': apiKey,
       'pinCode': pinCode,
+      'name': name,
     };
   }
 
@@ -20,8 +23,10 @@ class SiteModel {
     return SiteModel(
       apiKey: (map['apiKey'] ?? '') as String,
       pinCode: (map['pinCode'] ?? 0) as int,
+      name: (map['name'] ?? '') as String,
     );
   }
 
-  factory SiteModel.fromJson(String source) => SiteModel.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory SiteModel.fromJson(String source) =>
+      SiteModel.fromMap(json.decode(source) as Map<String, dynamic>);
 }

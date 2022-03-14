@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -6,10 +7,11 @@ import 'package:solacellanalysin/models/details_model.dart';
 import 'package:solacellanalysin/models/menu_model.dart';
 import 'package:solacellanalysin/models/overview_model.dart';
 import 'package:solacellanalysin/models/site_current_power_flow_model.dart';
+import 'package:solacellanalysin/models/site_model.dart';
+import 'package:solacellanalysin/states/check_pin_code.dart';
 import 'package:solacellanalysin/utility/my_constant.dart';
 import 'package:solacellanalysin/widgets/show_card.dart';
 import 'package:solacellanalysin/widgets/show_progress.dart';
-import 'package:solacellanalysin/widgets/show_signout.dart';
 import 'package:solacellanalysin/widgets/show_text.dart';
 
 class MainHome extends StatefulWidget {
@@ -30,13 +32,13 @@ class _MainHomeState extends State<MainHome> {
     'Site Details',
     'Settings',
     'About',
-    'LogOut',
+    
   ];
   var pathRounts = <String>[
     MyConstant.routeSiteDetails,
-    MyConstant.routeSettings,
-    MyConstant.routeAbout,
     '',
+    MyConstant.routeAbout,
+    
   ];
 
   var menuModels = <MenuModel>[];
@@ -44,6 +46,8 @@ class _MainHomeState extends State<MainHome> {
 
   OverviewModel? overviewModel;
   SiteCurrentPowerFlow? siteCurrentPowerFlow;
+  var datas = <String>[];
+  SiteModel? siteModel;
 
   @override
   void initState() {
@@ -63,7 +67,7 @@ class _MainHomeState extends State<MainHome> {
 
   Future<void> readData() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    var datas = preferences.getStringList('data');
+    datas = preferences.getStringList('data')!;
 
     // for Read Details
     String pathAPI =
@@ -100,12 +104,20 @@ class _MainHomeState extends State<MainHome> {
         siteCurrentPowerFlow = SiteCurrentPowerFlow.fromMap(result);
       });
     });
+
+    // for SiteModel
+    await FirebaseFirestore.instance
+        .collection('site')
+        .doc(datas[0])
+        .get()
+        .then((value) {
+      siteModel = SiteModel.fromMap(value.data()!);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-     
       body: load
           ? const ShowProgress()
           : LayoutBuilder(builder: (context, constraints) {
@@ -290,10 +302,22 @@ class _MainHomeState extends State<MainHome> {
       onChanged: (value) {
         MenuModel menuModel = value;
         if (menuModel.pathRoute.isNotEmpty) {
-          print('Status Route ==>> ${menuModel.pathRoute}');
           Navigator.pushNamed(context, menuModel.pathRoute);
         } else {
-          print('Status Logout');
+          switch (menuModel.title) {
+            case 'Settings':
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CheckPinCode(
+                      siteModel: siteModel!,
+                      siteId: datas[0],
+                      setting: true,
+                    ),
+                  ));
+              break;
+            default:
+          }
         }
       });
 

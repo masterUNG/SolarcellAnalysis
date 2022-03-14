@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solacellanalysin/states/about.dart';
 import 'package:solacellanalysin/states/add_site_id.dart';
 import 'package:solacellanalysin/states/find_apikey.dart';
+import 'package:solacellanalysin/states/login_by_name.dart';
 import 'package:solacellanalysin/states/main_home.dart';
 import 'package:solacellanalysin/states/setting.dart';
 import 'package:solacellanalysin/states/site_details.dart';
@@ -18,6 +19,7 @@ final Map<String, WidgetBuilder> map = {
   MyConstant.routeSettings: (context) => const Setting(),
   MyConstant.routeAbout: (context) => const About(),
   MyConstant.routeAddSiteId: (context) => const AddSiteId(),
+  MyConstant.routeLoginByName:(context) => const LoginByName(),
 };
 
 String? firstState;
@@ -30,7 +32,7 @@ Future<void> main() async {
   var result = preferences.getStringList('data');
   // print('result ==> $result');
   if (result == null) {
-    firstState = MyConstant.routeAddSiteId;
+    firstState = MyConstant.routeLoginByName;
   } else {
     firstState = MyConstant.routeMainHome;
   }

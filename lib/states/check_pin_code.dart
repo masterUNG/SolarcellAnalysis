@@ -12,10 +12,12 @@ import 'package:solacellanalysin/widgets/show_imge.dart';
 class CheckPinCode extends StatefulWidget {
   final SiteModel siteModel;
   final String siteId;
+  final bool? setting;
   const CheckPinCode({
     Key? key,
     required this.siteModel,
     required this.siteId,
+    this.setting,
   }) : super(key: key);
 
   @override
@@ -25,12 +27,14 @@ class CheckPinCode extends StatefulWidget {
 class _CheckPinCodeState extends State<CheckPinCode> {
   SiteModel? siteModel;
   OtpFieldController controller = OtpFieldController();
+  bool? setting;
 
   @override
   void initState() {
     super.initState();
     siteModel = widget.siteModel;
-    print('My Pin ==> ${siteModel!.pinCode}');
+    setting = widget.setting;
+    setting ?? false;
   }
 
   @override
@@ -53,7 +57,12 @@ class _CheckPinCodeState extends State<CheckPinCode> {
             width: 250,
             onCompleted: (String string) {
               if (string == siteModel!.pinCode.toString()) {
-                processSaveData();
+                if (setting ?? false) {
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, MyConstant.routeSettings, (route) => false);
+                } else {
+                  processSaveData();
+                }
               } else {
                 controller.clear();
                 MyDialog(context: context).normalDialog(

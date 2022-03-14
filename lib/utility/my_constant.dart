@@ -7,6 +7,7 @@ class MyConstant {
   static String routeSettings = '/settings';
   static String routeAbout = '/about';
   static String routeAddSiteId = '/addSiteId';
+  static String routeLoginByName = '/loginByName';
 
   //Paper
   static String apiKey = '09HQHOJQYBLAF6N96LHGCGRFS68X13A9';

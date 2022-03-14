@@ -17,10 +17,44 @@ class MyDialog {
       builder: (context) => AlertDialog(
         title: ListTile(
           leading: const ShowImage(),
-          title: ShowText(label: title, textStyle: MyConstant().h2Style(),),
+          title: ShowText(
+            label: title,
+            textStyle: MyConstant().h2Style(),
+          ),
           subtitle: ShowText(label: message),
         ),
-        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))],
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context), child: const Text('OK'))
+        ],
+      ),
+    );
+  }
+
+  Future<void> actionDialog({
+    required String title,
+    required String message,
+    required String labePressFunc,
+    required Function() pressFunc,
+  }) async {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: ListTile(
+          leading: const ShowImage(),
+          title: ShowText(
+            label: title,
+            textStyle: MyConstant().h2Style(),
+          ),
+          subtitle: ShowText(label: message),
+        ),
+        actions: [
+          TextButton(onPressed: pressFunc, child: Text(labePressFunc)),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+        ],
       ),
     );
   }
