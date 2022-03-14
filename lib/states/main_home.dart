@@ -71,7 +71,7 @@ class _MainHomeState extends State<MainHome> {
 
     // for Read Details
     String pathAPI =
-        'https://monitoringapi.solaredge.com/site/${datas![0]}/details?api_key=${datas[1]}';
+        'https://monitoringapi.solaredge.com/site/${datas[0]}/details?api_key=${datas[1]}';
     await Dio().get(pathAPI).then((value) {
       Map<String, dynamic> map = value.data;
       var detailsMap = map['details'];
