@@ -1,8 +1,11 @@
+// ignore_for_file: avoid_print
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:solacellanalysin/models/banner_model.dart';
 import 'package:solacellanalysin/models/details_model.dart';
 import 'package:solacellanalysin/models/env_benefits_model.dart';
 import 'package:solacellanalysin/models/menu_model.dart';
@@ -11,10 +14,12 @@ import 'package:solacellanalysin/models/site_current_power_flow_model.dart';
 import 'package:solacellanalysin/models/site_model.dart';
 import 'package:solacellanalysin/states/check_pin_code.dart';
 import 'package:solacellanalysin/utility/my_constant.dart';
+import 'package:solacellanalysin/utility/my_dialog.dart';
 import 'package:solacellanalysin/widgets/show_card.dart';
 import 'package:solacellanalysin/widgets/show_imge.dart';
 import 'package:solacellanalysin/widgets/show_progress.dart';
 import 'package:solacellanalysin/widgets/show_text.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MainHome extends StatefulWidget {
   const MainHome({
@@ -49,6 +54,7 @@ class _MainHomeState extends State<MainHome> {
   SiteCurrentPowerFlow? siteCurrentPowerFlow;
   var datas = <String>[];
   SiteModel? siteModel;
+  BannerModel? lastesBannerModel;
 
   @override
   void initState() {
@@ -69,6 +75,22 @@ class _MainHomeState extends State<MainHome> {
   Future<void> readData() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     datas = preferences.getStringList('data')!;
+
+    // for Read Banner
+    await FirebaseFirestore.instance
+        .collection('banner')
+        .orderBy('dateAdd', descending: true)
+        .get()
+        .then((value) {
+      bool status = true;
+      for (var item in value.docs) {
+        print('#17mar item Banner ==>> ${item.data()}');
+        if (status) {
+          lastesBannerModel = BannerModel.fromMap(item.data());
+          status = false;
+        }
+      }
+    });
 
     // for Read Details
     String pathAPI =
@@ -141,6 +163,7 @@ class _MainHomeState extends State<MainHome> {
                     newInforTop(constraints),
                     newPowerLoadGrid(constraints),
                     newPowerFlow(constraints),
+                    newBanner(constraints),
                     newMaintenance(
                         constraints: constraints,
                         path: 'images/manten1.png',
@@ -172,6 +195,20 @@ class _MainHomeState extends State<MainHome> {
                 ),
               );
             }),
+    );
+  }
+
+  Widget newBanner(BoxConstraints constraints) {
+    return InkWell(
+      onTap: () {
+        gotoUrl();
+      },
+      child: SizedBox(
+        width: constraints.maxWidth,
+        child: lastesBannerModel == null
+            ? const ShowProgress()
+            : Image.network(lastesBannerModel!.pathBanner),
+      ),
     );
   }
 
@@ -347,8 +384,8 @@ class _MainHomeState extends State<MainHome> {
           top: constraints.maxWidth * 0.33 * 0.5 - 8,
           right: constraints.maxWidth * 0.33 - 8,
           child: const Icon(
-            Icons.arrow_forward,
-            color: Colors.green,
+            Icons.arrow_back,
+            color: Colors.orange,
           ),
         ),
       ],
@@ -485,5 +522,14 @@ class _MainHomeState extends State<MainHome> {
     String string = numberFormat.format(revenue);
     result = '฿ $string';
     return result;
+  }
+
+  Future<void> gotoUrl() async {
+    if (await canLaunch(lastesBannerModel!.pathUrl)) {
+      await launch(lastesBannerModel!.pathUrl);
+    } else {
+      MyDialog(context: context).normalDialog(
+          title: 'Banner False', message: 'Please Try Again Next Time');
+    }
   }
 }
