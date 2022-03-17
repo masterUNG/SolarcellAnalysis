@@ -100,7 +100,7 @@ class _MainHomeState extends State<MainHome> {
         'https://monitoringapi.solaredge.com/site/${datas[0]}/currentPowerFlow?api_key=${datas[1]}';
     await Dio().get(pathCurrentPowerFlow).then((value) {
       var result = value.data['siteCurrentPowerFlow'];
-      print('reslut CurrentPowerFlow ==>> $result');
+      print('#17mar reslut CurrentPowerFlow ==>> $result');
       setState(() {
         siteCurrentPowerFlow = SiteCurrentPowerFlow.fromMap(result);
       });
@@ -306,30 +306,50 @@ class _MainHomeState extends State<MainHome> {
     );
   }
 
-  Row newPowerLoadGrid(BoxConstraints constraints) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
+  Widget newPowerLoadGrid(BoxConstraints constraints) {
+    return Stack(
       children: [
-        ShowCard(
-          size: constraints.maxWidth * 0.33,
-          label: overviewModel == null
-              ? ''
-              : '${overviewModel!.currentPower.power} kW',
-          pathImage: 'images/current.png',
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            ShowCard(
+              size: constraints.maxWidth * 0.33,
+              label: siteCurrentPowerFlow == null
+                  ? ''
+                  : '${siteCurrentPowerFlow!.pv.currentPower} kW',
+              pathImage: 'images/current.png',
+            ),
+            ShowCard(
+              size: constraints.maxWidth * 0.33,
+              label: siteCurrentPowerFlow == null
+                  ? ''
+                  : '${siteCurrentPowerFlow!.load.currentPower} ${siteCurrentPowerFlow!.unit}',
+              pathImage: 'images/load.png',
+            ),
+            ShowCard(
+              size: constraints.maxWidth * 0.33,
+              label: siteCurrentPowerFlow == null
+                  ? ''
+                  : '${siteCurrentPowerFlow!.grid.currentPower} ${siteCurrentPowerFlow!.unit}',
+              pathImage: 'images/grid.png',
+            ),
+          ],
         ),
-        ShowCard(
-          size: constraints.maxWidth * 0.33,
-          label: siteCurrentPowerFlow == null
-              ? ''
-              : '${siteCurrentPowerFlow!.load.currentPower} ${siteCurrentPowerFlow!.unit}',
-          pathImage: 'images/load.png',
+        Positioned(
+          top: constraints.maxWidth * 0.33 * 0.5 - 8,
+          left: constraints.maxWidth * 0.33 - 8,
+          child: const Icon(
+            Icons.arrow_forward,
+            color: Colors.green,
+          ),
         ),
-        ShowCard(
-          size: constraints.maxWidth * 0.33,
-          label: siteCurrentPowerFlow == null
-              ? ''
-              : '${siteCurrentPowerFlow!.grid.currentPower} ${siteCurrentPowerFlow!.unit}',
-          pathImage: 'images/grid.png',
+        Positioned(
+          top: constraints.maxWidth * 0.33 * 0.5 - 8,
+          right: constraints.maxWidth * 0.33 - 8,
+          child: const Icon(
+            Icons.arrow_forward,
+            color: Colors.green,
+          ),
         ),
       ],
     );

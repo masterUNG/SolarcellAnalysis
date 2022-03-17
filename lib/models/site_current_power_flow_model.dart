@@ -88,19 +88,23 @@ class Load {
 
 class Pv {
   final String status;
+  final double currentPower;
   Pv({
     required this.status,
+    required this.currentPower,
   });
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'status': status,
+      'currentPower': currentPower,
     };
   }
 
   factory Pv.fromMap(Map<String, dynamic> map) {
     return Pv(
       status: (map['status'] ?? '') as String,
+      currentPower: (map['currentPower'] ?? 0.0) as double,
     );
   }
 
