@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:solacellanalysin/models/details_model.dart';
+import 'package:solacellanalysin/models/env_benefits_model.dart';
 import 'package:solacellanalysin/models/menu_model.dart';
 import 'package:solacellanalysin/models/overview_model.dart';
 import 'package:solacellanalysin/models/site_current_power_flow_model.dart';
@@ -11,6 +12,7 @@ import 'package:solacellanalysin/models/site_model.dart';
 import 'package:solacellanalysin/states/check_pin_code.dart';
 import 'package:solacellanalysin/utility/my_constant.dart';
 import 'package:solacellanalysin/widgets/show_card.dart';
+import 'package:solacellanalysin/widgets/show_imge.dart';
 import 'package:solacellanalysin/widgets/show_progress.dart';
 import 'package:solacellanalysin/widgets/show_text.dart';
 
@@ -32,17 +34,16 @@ class _MainHomeState extends State<MainHome> {
     'Site Details',
     'Settings',
     'About',
-    
   ];
   var pathRounts = <String>[
     MyConstant.routeSiteDetails,
     '',
     MyConstant.routeAbout,
-    
   ];
 
   var menuModels = <MenuModel>[];
   var chooseMenu;
+  EnvBenefitsModel? envBenefitsModel;
 
   OverviewModel? overviewModel;
   SiteCurrentPowerFlow? siteCurrentPowerFlow;
@@ -78,7 +79,7 @@ class _MainHomeState extends State<MainHome> {
 
       setState(() {
         detailsModel = DetailsModel.fromMap(detailsMap);
-        load = false;
+
         urlImage =
             'https://monitoringapi.solaredge.com${detailsModel!.uris.SITEIMAGE}?hash=123456789&api_key=${datas[1]}';
       });
@@ -113,6 +114,19 @@ class _MainHomeState extends State<MainHome> {
         .then((value) {
       siteModel = SiteModel.fromMap(value.data()!);
     });
+
+    // for envBenefits
+    String pathEnvBenefits =
+        'https://monitoringapi.solaredge.com/site/${datas[0]}/envBenefits?api_key=${datas[1]}';
+    await Dio().get(pathEnvBenefits).then((value) {
+      print('#17mar value EnvBenefits ==>> $value');
+      Map<String, dynamic> envBenefitsMap = value.data['envBenefits'];
+      print('#17mar envBenefitsMap ==>>> $envBenefitsMap');
+      setState(() {
+        load = false;
+        envBenefitsModel = EnvBenefitsModel.fromMap(envBenefitsMap);
+      });
+    });
   }
 
   @override
@@ -121,75 +135,174 @@ class _MainHomeState extends State<MainHome> {
       body: load
           ? const ShowProgress()
           : LayoutBuilder(builder: (context, constraints) {
-              return Column(
-                children: [
-                  newInforTop(constraints),
-                  newPowerLoadGrid(constraints),
-                  SizedBox(
-                    height: constraints.maxWidth * 0.25,
-                    child: Card(
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 8),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                const ShowText(label: 'Today'),
-                                ShowText(
-                                  label: overviewModel == null
-                                      ? ''
-                                      : calculateValue(
-                                          overviewModel!.lastDayData.energy),
-                                  textStyle: MyConstant().h2Style(),
-                                ),
-                                const ShowText(label: ''),
-                              ],
-                            ),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                const ShowText(label: 'This Mouth'),
-                                ShowText(
-                                  label: overviewModel == null
-                                      ? ''
-                                      : calculateValue(
-                                          overviewModel!.lastMonthData.energy),
-                                  textStyle: MyConstant().h2Style(),
-                                ),
-                                const ShowText(label: ''),
-                              ],
-                            ),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                const ShowText(label: 'LifeTime'),
-                                ShowText(
-                                  label: overviewModel == null
-                                      ? ''
-                                      : calculateValue(
-                                          overviewModel!.lifeTimeData.energy),
-                                  textStyle: MyConstant().h2Style(),
-                                ),
-                                ShowText(
-                                  label: overviewModel == null
-                                      ? ''
-                                      : calculateCurrecy(
-                                          overviewModel!.lifeTimeData.revenue),
-                                  textStyle: MyConstant().h3GreenStyle(),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
+              return SingleChildScrollView(
+                child: Column(
+                  children: [
+                    newInforTop(constraints),
+                    newPowerLoadGrid(constraints),
+                    newPowerFlow(constraints),
+                    newMaintenance(
+                        constraints: constraints,
+                        path: 'images/manten1.png',
+                        label: 'Maintenance 1',
+                        timestamp: siteModel!.mainten1),
+                    newMaintenance(
+                        constraints: constraints,
+                        path: 'images/manten2.png',
+                        label: 'Maintenance 2',
+                        timestamp: siteModel!.mainten2),
+                    newMaintenance(
+                        constraints: constraints,
+                        path: 'images/manten3.png',
+                        label: 'Maintenance 3',
+                        timestamp: siteModel!.mainten3),
+                    newEnvBenefits(
+                        constraints: constraints,
+                        path: 'images/co2.png',
+                        label: 'CO2 Emission Saved',
+                        value: envBenefitsModel!.gasEmissionSaved.co2,
+                        units: envBenefitsModel!.gasEmissionSaved.units),
+                    newEnvBenefits(
+                      constraints: constraints,
+                      path: 'images/tree.png',
+                      label: 'Equivalent Trees Planted',
+                      value: envBenefitsModel!.treesPlanted,
                     ),
-                  )
-                ],
+                  ],
+                ),
               );
             }),
+    );
+  }
+
+  Card newEnvBenefits({
+    required BoxConstraints constraints,
+    required String path,
+    required String label,
+    required double value,
+    String? units,
+  }) {
+    String valueString = '';
+    if (envBenefitsModel != null) {
+      NumberFormat format = NumberFormat('#,###.##', 'en_US');
+      valueString = format.format(value);
+      if (units != null) {
+        valueString = '$valueString $units';
+      }
+    }
+
+    return Card(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: constraints.maxWidth * 0.75,
+            child: ListTile(
+              leading: ShowImage(
+                path: path,
+              ),
+              title: ShowText(label: label),
+              subtitle: ShowText(
+                label: envBenefitsModel == null ? '' : valueString,
+                textStyle: MyConstant().h3GreenStyle(),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Card newMaintenance({
+    required BoxConstraints constraints,
+    required String path,
+    required String label,
+    required Timestamp timestamp,
+  }) {
+    String dateString = 'dd / MMM / yyyy';
+    DateFormat dateFormat = DateFormat('dd MMM yyyy');
+    dateString = dateFormat.format(timestamp.toDate());
+
+    return Card(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: constraints.maxWidth * 0.75,
+            child: ListTile(
+              leading: ShowImage(
+                path: path,
+              ),
+              title: ShowText(label: label),
+              subtitle: ShowText(
+                label: dateString,
+                textStyle: MyConstant().h3GreenStyle(),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  SizedBox newPowerFlow(BoxConstraints constraints) {
+    return SizedBox(
+      height: constraints.maxWidth * 0.25,
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  const ShowText(label: 'Today'),
+                  ShowText(
+                    label: overviewModel == null
+                        ? ''
+                        : calculateValue(overviewModel!.lastDayData.energy),
+                    textStyle: MyConstant().h2Style(),
+                  ),
+                  const ShowText(label: ''),
+                ],
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  const ShowText(label: 'This Mouth'),
+                  ShowText(
+                    label: overviewModel == null
+                        ? ''
+                        : calculateValue(overviewModel!.lastMonthData.energy),
+                    textStyle: MyConstant().h2Style(),
+                  ),
+                  const ShowText(label: ''),
+                ],
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  const ShowText(label: 'LifeTime'),
+                  ShowText(
+                    label: overviewModel == null
+                        ? ''
+                        : calculateValue(overviewModel!.lifeTimeData.energy),
+                    textStyle: MyConstant().h2Style(),
+                  ),
+                  ShowText(
+                    label: overviewModel == null
+                        ? ''
+                        : calculateCurrecy(overviewModel!.lifeTimeData.revenue),
+                    textStyle: MyConstant().h3GreenStyle(),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 

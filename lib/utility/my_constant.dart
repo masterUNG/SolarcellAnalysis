@@ -9,6 +9,8 @@ class MyConstant {
   static String routeAddSiteId = '/addSiteId';
   static String routeLoginByName = '/loginByName';
 
+  static String appName = 'Solar Monitor';
+
   //Paper
   static String apiKey = '09HQHOJQYBLAF6N96LHGCGRFS68X13A9';
   static String siteId = '2345733';
@@ -18,7 +20,7 @@ class MyConstant {
   // static String siteId = '1598054';
 
   static Color primary = Color.fromARGB(255, 204, 101, 5);
-  static Color dark =  Colors.black;
+  static Color dark = Colors.black;
   static Color light = const Color.fromARGB(255, 235, 176, 66);
 
   TextStyle h1Style() => TextStyle(
@@ -57,7 +59,7 @@ class MyConstant {
         fontWeight: FontWeight.normal,
       );
 
-       TextStyle h3GreenStyle() => const TextStyle(
+  TextStyle h3GreenStyle() => const TextStyle(
         color: Color.fromARGB(255, 19, 116, 22),
         fontSize: 14,
         fontWeight: FontWeight.normal,
