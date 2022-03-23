@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.flutterthailand.solacellanalysin">
    <application
-        android:label="solacellanalysin"
+        android:label="Ung Solar"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

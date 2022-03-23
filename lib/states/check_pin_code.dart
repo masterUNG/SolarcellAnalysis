@@ -48,13 +48,13 @@ class _CheckPinCodeState extends State<CheckPinCode> {
           const SizedBox(
             height: 16,
           ),
-          OTPTextField(
+          OTPTextField(keyboardType: TextInputType.text,
             fieldStyle: FieldStyle.box,
             otpFieldStyle: OtpFieldStyle(backgroundColor: Colors.grey.shade300),
             fieldWidth: 40,
             controller: controller,
-            length: 4,
-            width: 250,
+            length: 6,
+            width: 300,
             onCompleted: (String string) {
               if (string == siteModel!.pinCode.toString()) {
                 if (setting ?? false) {
